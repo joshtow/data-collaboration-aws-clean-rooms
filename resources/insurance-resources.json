@@ -1,0 +1,317 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "TFC Summit Week 2023 - Data Governance Workshop",
+	"Parameters": {
+	},
+	"Resources": {
+		"s3BucketData": {
+			"Type": "AWS::S3::Bucket",
+			"Properties": {
+				"AccessControl": "BucketOwnerFullControl",
+				"PublicAccessBlockConfiguration": {
+					"BlockPublicAcls": true,
+					"BlockPublicPolicy": true,
+					"IgnorePublicAcls": true,
+					"RestrictPublicBuckets": true
+				},
+				"BucketName": {
+					"Fn::Sub": "${AWS::AccountId}-${AWS::StackName}-advdata"
+				}
+			}
+		},
+		"GlueExecutionRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"RoleName": {"Fn::Sub":"${AWS::StackName}-GlueExecutionRole"},
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": [
+									"glue.amazonaws.com"
+								]
+							},
+							"Action": [
+								"sts:AssumeRole"
+							]
+						}
+					]
+				},
+				"ManagedPolicyArns": [
+					"arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+				],
+				"Policies": [
+					{
+						"PolicyName": "CWPolicy",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Sid": "VisualEditor0",
+									"Effect": "Allow",
+									"Action": "cloudwatch:PutMetricData",
+									"Resource": "*"
+								},
+								{
+									"Sid": "VisualEditor1",
+									"Effect": "Allow",
+									"Action": "logs:PutLogEvents",
+									"Resource": {
+										"Fn::Sub": "arn:aws:logs:*:${AWS::AccountId}:log-group:*:log-stream:*"
+									}
+								},
+								{
+									"Sid": "VisualEditor2",
+									"Effect": "Allow",
+									"Action": [
+										"logs:CreateLogStream",
+										"logs:CreateLogGroup"
+									],
+									"Resource": {
+										"Fn::Sub": "arn:aws:logs:*:${AWS::AccountId}:log-group:*"
+									}
+								},
+								{
+									"Sid": "VisualEditor3",
+									"Effect": "Allow",
+									"Action": "logs:AssociateKmsKey",
+									"Resource": {
+										"Fn::Sub": "arn:aws:logs:*:${AWS::AccountId}:log-group:*"
+									}
+								}
+							]
+						}
+					},
+					{
+						"PolicyName": "GluePolicy",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Sid": "lakeformationsid",
+									"Effect": "Allow",
+									"Action": [
+										"lakeformation:GetDataAccess"
+									],
+									"Resource": "*"
+								},
+								{
+									"Sid": "s3sid",
+									"Effect": "Allow",
+									"Action": [
+										"s3:PutObject",
+										"s3:GetObject",
+										"s3:DeleteObject"
+									],
+									"Resource": [
+										{
+											"Fn::GetAtt": [
+												"s3BucketData",
+												"Arn"
+											]
+										},
+										{
+											"Fn::Join": [
+												"",
+												[
+													{
+														"Fn::GetAtt": [
+															"s3BucketData",
+															"Arn"
+														]
+													},
+													"/*"
+												]
+											]
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"PolicyName": "PassrolePolicy",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Sid": "VisualEditor0",
+									"Effect": "Allow",
+									"Action": "iam:PassRole",
+									"Resource": "*"
+								}
+							]
+						}
+					}
+				]
+			}
+		},
+		"DomainDatabase": {
+			"Type": "AWS::Glue::Database",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseInput": {
+					"Description": "Database",
+					"Name": "AdvertisingDatabase",
+					"LocationUri": {
+						"Fn::Join": [
+							"",
+							[
+								"s3://",
+								{
+									"Ref": "s3BucketData"
+								}
+							]
+						]
+					}
+				}
+			}
+		},
+		"GlueCrawler": {
+			"Type": "AWS::Glue::Crawler",
+			"DependsOn": "GlueExecutionRole", 
+			"Properties": {
+				"DatabaseName": {
+					"Ref": "DomainDatabase"
+				},
+				"Description": "Crawler",
+				"Name": {"Fn::Sub":"${AWS::StackName}-crawler"},
+				"Role": {
+					"Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-GlueExecutionRole"
+				},
+				"TablePrefix": "",
+				"Targets": {
+					"S3Targets": [
+						{
+							"Path": {
+								"Fn::Join": [
+									"",
+									[
+										"s3://",
+										{
+											"Ref": "s3BucketData"
+										},
+										"/data/"
+									]
+								]
+							}
+						}
+					]
+				}
+			}
+		},
+		"CleanRoomsServiceRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"RoleName": {"Fn::Sub":"${AWS::StackName}-AdvCleanRoomsServiceRole",
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": [
+									"cleanrooms.amazonaws.com"
+								]
+							},
+							"Action": [
+								"sts:AssumeRole"
+							]
+						}
+					]
+				},
+				"Policies": [
+					{
+						"PolicyName": "GlueS3Policy",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Sid": "NecessaryGluePermissions",
+									"Effect": "Allow",
+									"Action": [
+										"glue:GetDatabase",
+										"glue:GetDatabases",
+										"glue:GetTable",
+										"glue:GetTables",
+										"glue:GetPartition",
+										"glue:GetPartitions",
+										"glue:BatchGetPartition"
+									],
+									"Resource": [
+										{
+											"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/*"
+										},
+										{
+											"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/*"
+										},
+										{
+											"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:*"
+										}
+									]
+								},
+								{
+									"Effect": "Allow",
+									"Action": [
+										"glue:GetSchema",
+										"glue:GetSchemaVersion"
+									],
+									"Resource": [
+										"*"
+									]
+								},
+								{
+									"Sid": "NecessaryS3BucketPermissions",
+									"Effect": "Allow",
+									"Action": [
+										"s3:GetBucketLocation",
+										"s3:ListBucket"
+									],
+									"Resource": [
+										{
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
+										}
+									],
+									"Condition": {
+										"StringEquals": {
+											"s3:ResourceAccount": [
+												{
+													"Fn::Sub": "${AWS::AccountId}"
+												}
+											]
+										}
+									}
+								},
+								{
+									"Sid": "NecessaryS3ObjectPermissions",
+									"Effect": "Allow",
+									"Action": [
+										"s3:GetObject"
+									],
+									"Resource": [
+										{
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
+										}
+									],
+									"Condition": {
+										"StringEquals": {
+											"s3:ResourceAccount": [
+												{
+													"Fn::Sub": "${AWS::AccountId}"
+												}
+											]
+										}
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+	}
+}
