@@ -1,8 +1,7 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
 	"Description": "TFC Summit Week 2023 - Data Governance Workshop",
-	"Parameters": {
-	},
+	"Parameters": {},
 	"Resources": {
 		"s3BucketData": {
 			"Type": "AWS::S3::Bucket",
@@ -15,14 +14,16 @@
 					"RestrictPublicBuckets": true
 				},
 				"BucketName": {
-					"Fn::Sub": "${AWS::AccountId}-${AWS::StackName}-advdata"
+					"Fn::Sub": "${AWS::AccountId}-${AWS::StackName}-insdata"
 				}
 			}
 		},
 		"GlueExecutionRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
-				"RoleName": {"Fn::Sub":"${AWS::StackName}-GlueExecutionRole"},
+				"RoleName": {
+					"Fn::Sub": "${AWS::StackName}-InsGlueExecutionRole"
+				},
 				"AssumeRolePolicyDocument": {
 					"Version": "2012-10-17",
 					"Statement": [
@@ -156,7 +157,7 @@
 				},
 				"DatabaseInput": {
 					"Description": "Database",
-					"Name": "AdvertisingDatabase",
+					"Name": "insurancedatabase",
 					"LocationUri": {
 						"Fn::Join": [
 							"",
@@ -173,15 +174,17 @@
 		},
 		"GlueCrawler": {
 			"Type": "AWS::Glue::Crawler",
-			"DependsOn": "GlueExecutionRole", 
+			"DependsOn": "GlueExecutionRole",
 			"Properties": {
 				"DatabaseName": {
 					"Ref": "DomainDatabase"
 				},
 				"Description": "Crawler",
-				"Name": {"Fn::Sub":"${AWS::StackName}-crawler"},
+				"Name": {
+					"Fn::Sub": "${AWS::StackName}-ins-crawler"
+				},
 				"Role": {
-					"Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-GlueExecutionRole"
+					"Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-InsGlueExecutionRole"
 				},
 				"TablePrefix": "",
 				"Targets": {
@@ -207,7 +210,9 @@
 		"CleanRoomsServiceRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
-				"RoleName": {"Fn::Sub":"${AWS::StackName}-AdvCleanRoomsServiceRole",
+				"RoleName": {
+					"Fn::Sub": "${AWS::StackName}-InsCleanRoomsServiceRole"
+				},
 				"AssumeRolePolicyDocument": {
 					"Version": "2012-10-17",
 					"Statement": [
@@ -273,7 +278,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-insdata"
 										}
 									],
 									"Condition": {
@@ -294,7 +299,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-insdata"
 										}
 									],
 									"Condition": {

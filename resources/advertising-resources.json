@@ -1,8 +1,7 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
 	"Description": "TFC Summit Week 2023 - Data Governance Workshop",
-	"Parameters": {
-	},
+	"Parameters": {},
 	"Resources": {
 		"s3BucketData": {
 			"Type": "AWS::S3::Bucket",
@@ -15,14 +14,31 @@
 					"RestrictPublicBuckets": true
 				},
 				"BucketName": {
-					"Fn::Sub": "${AWS::AccountId}-${AWS::StackName}-insurancedata"
+					"Fn::Sub": "${AWS::AccountId}-${AWS::StackName}-advertisingdata"
+				}
+			}
+		},
+		"s3BucketDataQueryResults": {
+			"Type": "AWS::S3::Bucket",
+			"Properties": {
+				"AccessControl": "BucketOwnerFullControl",
+				"PublicAccessBlockConfiguration": {
+					"BlockPublicAcls": true,
+					"BlockPublicPolicy": true,
+					"IgnorePublicAcls": true,
+					"RestrictPublicBuckets": true
+				},
+				"BucketName": {
+					"Fn::Sub": "${AWS::AccountId}-${AWS::StackName}-queryresults"
 				}
 			}
 		},
 		"GlueExecutionRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
-				"RoleName": {"Fn::Sub":"${AWS::StackName}-GlueExecutionRole"},
+				"RoleName": {
+					"Fn::Sub": "${AWS::StackName}-AdvGlueExecutionRole"
+				},
 				"AssumeRolePolicyDocument": {
 					"Version": "2012-10-17",
 					"Statement": [
@@ -156,7 +172,7 @@
 				},
 				"DatabaseInput": {
 					"Description": "Database",
-					"Name": "InsuranceDatabase",
+					"Name": "advertisingdatabase",
 					"LocationUri": {
 						"Fn::Join": [
 							"",
@@ -173,15 +189,17 @@
 		},
 		"GlueCrawler": {
 			"Type": "AWS::Glue::Crawler",
-			"DependsOn": "GlueExecutionRole", 
+			"DependsOn": "GlueExecutionRole",
 			"Properties": {
 				"DatabaseName": {
-					"Ref": "InsuranceDatabase"
+					"Ref": "DomainDatabase"
 				},
 				"Description": "Crawler",
-				"Name": {"Fn::Sub":"${AWS::StackName}-crawler"},
+				"Name": {
+					"Fn::Sub": "${AWS::StackName}-adv-crawler"
+				},
 				"Role": {
-					"Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-GlueExecutionRole"
+					"Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-AdvGlueExecutionRole"
 				},
 				"TablePrefix": "",
 				"Targets": {
@@ -195,7 +213,7 @@
 										{
 											"Ref": "s3BucketData"
 										},
-										"/data/"
+										"/data/adimpressions/"
 									]
 								]
 							}
@@ -207,7 +225,9 @@
 		"CleanRoomsServiceRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
-				"RoleName": {"Fn::Sub":"${AWS::StackName}-InsCleanRoomsServiceRole",
+				"RoleName": {
+					"Fn::Sub": "${AWS::StackName}-AdvCleanRoomsServiceRole"
+				},
 				"AssumeRolePolicyDocument": {
 					"Version": "2012-10-17",
 					"Statement": [
@@ -273,7 +293,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-insurancedata"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
 										}
 									],
 									"Condition": {
@@ -294,7 +314,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-insurancedata"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
 										}
 									],
 									"Condition": {
@@ -313,7 +333,5 @@
 				]
 			}
 		}
-	},
-	"Outputs": {
 	}
 }
