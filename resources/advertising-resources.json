@@ -314,7 +314,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata/data/adimpressions/*"
 										}
 									],
 									"Condition": {

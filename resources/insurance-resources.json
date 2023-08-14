@@ -299,7 +299,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-insdata"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-insdata/data/*"
 										}
 									],
 									"Condition": {
