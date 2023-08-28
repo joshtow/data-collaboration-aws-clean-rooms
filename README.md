@@ -29,7 +29,7 @@ For this workshop, you will need two AWS accounts - one to represent the Insuran
 
 1.1. Login to your Insurance account.
 
-1.2. Download the CloudFormation template file here. This template will create the following in your account:
+1.2. Download the CloudFormation template file [here]([https://github.com/joshtow/data-collaboration-aws-clean-rooms/blob/1bf13297832127a34e1f9421292ce9b91879f29f/resources/advertising-resources.json](https://github.com/joshtow/data-collaboration-aws-clean-rooms/blob/1bf13297832127a34e1f9421292ce9b91879f29f/resources/insurance-resources.json)). This template will create the following in your account:
 - S3Bucket - <accountid>-cleanroomslab-insurancedata - this bucket will be used to hold our Insurance data.
 - IAM Role - <stackname>-InsGlueExecutionRole - this role will be used by AWS Glue to crawl the dataset.
 - Glue Catalog Database - InsuranceDatabase - this database will hold the metadata for our data.
@@ -135,7 +135,7 @@ Each configured table represents a reference to an existing table in the AWS Glu
 ### Step 8 - Setup Advertising Account
 
 8.1. Log into the Advertising account.
-8.2. Download the CloudFormation template file here. This template will create the following in your account:
+8.2. Download the CloudFormation template file [here](https://github.com/joshtow/data-collaboration-aws-clean-rooms/blob/1bf13297832127a34e1f9421292ce9b91879f29f/resources/advertising-resources.json). This template will create the following in your account:
 - S3Bucket - <accountid>-cleanroomslabadv-advertisingdata - this bucket will be used to hold our Insurance data.
 - S3Bucket - <accountid>-cleanroomslabadv-queryresults - this bucket will be used to hold our Insurance data.
 - IAM Role - <stackname>-AdvGlueExecutionRole - this role will be used by AWS Glue to crawl the dataset.
