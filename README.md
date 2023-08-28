@@ -89,7 +89,11 @@ aws s3 cp policies.csv s3://$accountid-cleanroomslabins-insdata/data/policies/po
 
 3.4. In **Configure membership**, turn on **Query Logging** and leave other configrations as default
 
-3.5. Click **Next** and select **Create collaboration and membership**
+3.5. Click **Next** 
+
+3.6. Leave **Yes, join by creating membership now** selected, then turn on **Query logging** and click **Next**.
+
+3.7 select **Create collaboration and membership**
 
 
 ## Step 4 - Create Configured Tables for the Insurance Data Set
@@ -99,7 +103,7 @@ Each configured table represents a reference to an existing table in the AWS Glu
 
 4.2. Click **Configure new table**
 
-4.3. Select **insurance** database, table **customers**
+4.3. Select **insurancedatabase** and table **customers**
 
 4.4. In **Columns allowed in collaborations**, select **All columns** and click **Configure new table**
 

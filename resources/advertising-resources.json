@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "TFC Summit Week 2023 - Data Governance Workshop",
+	"Description": "Data Collaboration with AWS Clean Rooms - Advertising",
 	"Parameters": {},
 	"Resources": {
 		"s3BucketData": {
@@ -293,7 +293,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advertisingdata"
 										}
 									],
 									"Condition": {
@@ -314,7 +314,7 @@
 									],
 									"Resource": [
 										{
-											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advdata/data/adimpressions/*"
+											"Fn::Sub": "arn:aws:s3:::${AWS::AccountId}-${AWS::StackName}-advertisingdata/data/adimpressions/*"
 										}
 									],
 									"Condition": {

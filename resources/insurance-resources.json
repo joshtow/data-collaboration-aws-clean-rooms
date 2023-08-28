@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "TFC Summit Week 2023 - Data Governance Workshop",
+	"Description": "Data Collaboration with AWS Clean Rooms - Insurance",
 	"Parameters": {},
 	"Resources": {
 		"s3BucketData": {
