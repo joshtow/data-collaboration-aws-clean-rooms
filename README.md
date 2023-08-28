@@ -247,8 +247,6 @@ aws s3 cp adimpressions.csv s3://$accountid-cleanroomslabadv-advertisingdata/dat
 
 12.4. Under **Existing service role name**, select the **-AdvCleanRoomsServiceRole** in the dropdown.
 
-12.5 Check **Add a pre-configured policy with the necessary permissions to this role.**.
-
 12.5. Click **Associate table**.
 
 ## Step 13 - Query the Data
