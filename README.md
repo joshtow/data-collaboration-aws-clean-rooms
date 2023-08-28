@@ -40,7 +40,7 @@ For this workshop, you will need two AWS accounts - one to represent the Insuran
 
 1.4. Click **Create stack**, then select **With new resources (standard)**
 
-1.5. Select **Upload a template file**, then browse to the the insurance-resources.json file and click **Next**.
+1.5. Select **Upload a template file**, then browse to the insurance-resources.json file and click **Next**.
 
 1.6. Enter ```cleanroomslabins``` as the **Stack name** and click **Next**.
 
@@ -182,7 +182,7 @@ Each configured table represents a reference to an existing table in the AWS Glu
 
 8.4. Click **Create stack**, then select **With new resources (standard)**
 
-8.5. Select **Upload a template file**, then browse to the the insurance-resources.json file and click **Next**.
+8.5. Select **Upload a template file**, then browse to the adverising-resources.json file and click **Next**.
 
 8.6. Enter ```cleanroomslabadv``` as the **Stack name** and click **Next**.
 
@@ -197,7 +197,7 @@ Each configured table represents a reference to an existing table in the AWS Glu
 ```bash
 accountid=$(aws sts get-caller-identity --query "Account" --output text)
 aws s3 cp s3://ws-assets-prod-iad-r-syd-b04c62a5f16f7b2e/d358030d-c47c-4c04-a580-bbe16e91ea74/v1_0/ad_impressions.csv ./adimpressions.csv
-aws s3 cp adimpressions.csv s3://$accountid-cleanroomslabadv-advdata/data/adimpressions/adimpressions.csv
+aws s3 cp adimpressions.csv s3://$accountid-cleanroomslabadv-advertisingdata/data/adimpressions/adimpressions.csv
 ```
 
 8.11. Navigate to **AWS Glue** in the AWS Management Console.
@@ -221,7 +221,7 @@ aws s3 cp adimpressions.csv s3://$accountid-cleanroomslabadv-advdata/data/adimpr
 ## Step 10 - Associate AdImpressions table
 10.1. Navigate to the **Configured tables**, and click **Configure new table**
 
-10.2. Select **advertisingdomain** database, table **adimpressions**
+10.2. Select **advertisingdatabase** database and the **adimpressions** table.
 
 10.3. In **Columns allowed in collaborations**, select **All columns** and click **Configure new table**
 
@@ -239,9 +239,11 @@ aws s3 cp adimpressions.csv s3://$accountid-cleanroomslabadv-advdata/data/adimpr
 
 12.2. Select the **Insurance-Advertiser-Collaboration** and click **Choose collaboration**.
 
-12.3. Under **Service access**, select **Create a new service role**.
+12.3. Under **Service access**, select **Use an existing service role**.
 
-12.4. Make sure you check the **Add a pre-configured policy with the necessary permissions to this role.** option.
+12.4. Under **Existing service role name**, select the **-AdvCleanRoomsServiceRole** in the dropdown.
+
+12.5 Check **Add a pre-configured policy with the necessary permissions to this role.**.
 
 12.5. Click **Associate table**.
 
